@@ -40,9 +40,7 @@ sub http_request {
 sub submit_fact {
   my ($self, $fact) = @_;
 
-  my $path = sprintf 'submit/%s/dist/%s/',
-    $fact->type,
-    $fact->resource;
+  my $path = sprintf 'submit/%s', $fact->type;
 
   my $req_url = $self->abs_url($path);
 
@@ -53,10 +51,10 @@ sub submit_fact {
     $req_url,
     Content_Type => 'application/json',
     Accept       => 'application/json',
-    Content      => [
-      JSON::XS->new->encode($struct), # metadata
-      $content,
-    ],
+    Content      => JSON->new->encode([
+      $struct,  # metadata
+      $content, # uh, content
+    ]),
   );
 
   # Is it reasonable to return an HTTP::Response?  I don't know.  For now,
