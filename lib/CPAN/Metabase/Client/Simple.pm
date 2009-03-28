@@ -1,6 +1,7 @@
 use 5.006;
 use strict;
 use warnings;
+
 package CPAN::Metabase::Client::Simple;
 
 =head1 NAME
@@ -18,21 +19,18 @@ use LWP::UserAgent;
 use URI;
 
 my @valid_args;
-BEGIN { @valid_args = qw(user key url) };
+BEGIN { @valid_args = qw(user key url) }
 use Object::Tiny @valid_args;
 
 sub new {
   my ($class, @args) = @_;
 
-  my %args = Params::Validate::validate(
-    @args,
-    { map { $_ => 1 } @valid_args }
-  );
+  my %args = Params::Validate::validate(@args, { map { $_ => 1 } @valid_args });
 
   my $self = bless \%args, $class;
 
   return $self;
-}   
+}
 
 sub http_request {
   my ($self, $request) = @_;
@@ -42,21 +40,23 @@ sub http_request {
 sub submit_fact {
   my ($self, $fact) = @_;
 
-  my $path = sprintf 'submit/%s/dist/%s/%s/',
+  my $path = sprintf 'submit/%s/dist/%s/',
     $fact->type,
-    $fact->dist_author,
-    $fact->dist_file;
+    $fact->resource;
 
   my $req_url = $self->abs_url($path);
 
+  my $struct  = $fact->as_struct;
+  my $content = delete $struct->{content};
+
   my $req = HTTP::Request::Common::POST(
     $req_url,
-    Content_Type => 'text/x-json',
-    Accept       => 'text/x-json',
-    Content => JSON::XS->new->encode({
-      version => $fact->schema_version,
-      content => $fact->content_as_string,
-    })
+    Content_Type => 'application/json',
+    Accept       => 'application/json',
+    Content      => [
+      JSON::XS->new->encode($struct), # metadata
+      $content,
+    ],
   );
 
   # Is it reasonable to return an HTTP::Response?  I don't know.  For now,
@@ -69,10 +69,8 @@ sub retrieve_fact {
 
   my $req_url = $self->abs_url("guid/$guid");
 
-  my $req = HTTP::Request::Common::GET(
-     $req_url,
-    'Accept' => 'text/x-json',
-  );
+  my $req
+    = HTTP::Request::Common::GET($req_url, 'Accept' => 'application/json',);
 
   $self->http_request($req);
 }
@@ -82,10 +80,8 @@ sub search {
 
   my $req_url = $self->abs_url("search/" . join('/', $method, @$args));
 
-  my $req = HTTP::Request::Common::GET(
-     $req_url,
-    'Accept' => 'text/x-json',
-  );
+  my $req
+    = HTTP::Request::Common::GET($req_url, 'Accept' => 'application/json',);
 
   my $res = $self->http_request($req);
 
