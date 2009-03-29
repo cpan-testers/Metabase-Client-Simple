@@ -45,16 +45,12 @@ sub submit_fact {
   my $req_url = $self->abs_url($path);
 
   my $struct  = $fact->as_struct;
-  my $content = delete $struct->{content};
 
   my $req = HTTP::Request::Common::POST(
     $req_url,
     Content_Type => 'application/json',
     Accept       => 'application/json',
-    Content      => JSON->new->encode([
-      $struct,  # metadata
-      $content, # uh, content
-    ]),
+    Content      => JSON->new->encode($struct),
   );
 
   # Is it reasonable to return an HTTP::Response?  I don't know.  For now,
