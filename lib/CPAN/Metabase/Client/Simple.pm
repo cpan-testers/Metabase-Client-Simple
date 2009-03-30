@@ -45,7 +45,7 @@ sub __validate_args {
 
 my @valid_args;
 BEGIN {
-  @valid_args = qw(user key url);
+  @valid_args = qw(user_profile url);
 
   for my $arg (@valid_args) {
     no strict 'refs';
@@ -78,13 +78,14 @@ sub submit_fact {
 
   my $req_url = $self->abs_url($path);
 
-  my $struct  = $fact->as_struct;
-
   my $req = HTTP::Request::Common::POST(
     $req_url,
     Content_Type => 'application/json',
     Accept       => 'application/json',
-    Content      => JSON->new->encode($struct),
+    Content      => JSON->new->encode({
+      fact => $fact->as_struct,
+      user => $self->user_profile, # should be $self->user_profile->as_struct
+    }),
   );
 
   # Is it reasonable to return an HTTP::Response?  I don't know.  For now,
