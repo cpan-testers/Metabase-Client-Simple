@@ -45,7 +45,7 @@ sub __validate_args {
 
 my @valid_args;
 BEGIN {
-  @valid_args = qw(user_profile url);
+  @valid_args = qw(profile url);
 
   for my $arg (@valid_args) {
     no strict 'refs';
@@ -76,6 +76,9 @@ sub submit_fact {
 
   my $path = sprintf 'submit/%s', $fact->type;
 
+  # XXX: should be $self->profile->guid
+  $fact->set_creator_id($self->profile->{metadata}{core}{guid}[1]);
+
   my $req_url = $self->abs_url($path);
 
   my $req = HTTP::Request::Common::POST(
@@ -83,14 +86,16 @@ sub submit_fact {
     Content_Type => 'application/json',
     Accept       => 'application/json',
     Content      => JSON->new->encode({
-      fact => $fact->as_struct,
-      user => $self->user_profile, # should be $self->user_profile->as_struct
+      fact      => $fact->as_struct,
+      submitter => $self->profile, # XXX: should be ->as_struct
     }),
   );
 
-  # Is it reasonable to return an HTTP::Response?  I don't know.  For now,
-  # let's say yes.
   my $response = $self->http_request($req);
+
+  # This wil be something more informational later, like "accepted" or
+  # "queued," maybe. -- rjbs, 2009-03-30
+  return 1;
 }
 
 sub retrieve_fact {
@@ -98,8 +103,10 @@ sub retrieve_fact {
 
   my $req_url = $self->abs_url("guid/$guid");
 
-  my $req
-    = HTTP::Request::Common::GET($req_url, 'Accept' => 'application/json',);
+  my $req = HTTP::Request::Common::GET(
+    $req_url,
+    'Accept' => 'application/json',
+  );
 
   $self->http_request($req);
 }
@@ -109,8 +116,10 @@ sub search {
 
   my $req_url = $self->abs_url("search/" . join('/', $method, @$args));
 
-  my $req
-    = HTTP::Request::Common::GET($req_url, 'Accept' => 'application/json',);
+  my $req = HTTP::Request::Common::GET(
+    $req_url,
+    'Accept' => 'application/json',
+  );
 
   my $res = $self->http_request($req);
 
