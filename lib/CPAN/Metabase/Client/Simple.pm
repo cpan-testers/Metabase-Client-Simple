@@ -94,14 +94,16 @@ sub submit_fact {
     }),
   );
 
-  my $response = $self->http_request($req);
+  my $res = $self->http_request($req);
+  Carp::confess("fact submission failed: " . $res->message)
+    unless $res->is_success;
 
   # This wil be something more informational later, like "accepted" or
   # "queued," maybe. -- rjbs, 2009-03-30
   return 1;
 }
 
-sub retrieve_fact {
+sub retrieve_fact_raw {
   my ($self, $guid) = @_;
 
   # What do we want to do when you're asking for a fact /with your
@@ -114,7 +116,14 @@ sub retrieve_fact {
     'Accept' => 'application/json',
   );
 
-  $self->http_request($req);
+  my $res = $self->http_request($req);
+
+  Carp::confess("fact retrieval failed: " . $res->message)
+    unless $res->is_success;
+
+  my $json = $res->content;
+
+  JSON->new->decode($json);
 }
 
 sub abs_url {
