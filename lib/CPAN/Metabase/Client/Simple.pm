@@ -90,7 +90,7 @@ sub submit_fact {
     Accept       => 'application/json',
     Content      => JSON->new->encode({
       fact      => $fact->as_struct,
-      submitter => $self->profile, # XXX: should be ->as_struct
+      submitter => $self->profile->as_struct,
     }),
   );
 
