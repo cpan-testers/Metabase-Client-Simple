@@ -68,6 +68,9 @@ sub new {
 
 sub http_request {
   my ($self, $request) = @_;
+  # Blah blah blah, it would be nice to cache this and maybe do some of that
+  # keepalive stuff that the cool kids are all talking about.
+  # -- rjbs, 2009-03-30
   LWP::UserAgent->new->request($request);
 }
 
@@ -101,6 +104,9 @@ sub submit_fact {
 sub retrieve_fact {
   my ($self, $guid) = @_;
 
+  # What do we want to do when you're asking for a fact /with your
+  # credentials/?  Let's say, for now, that you never do this...
+  # -- rjbs, 2009-03-30
   my $req_url = $self->abs_url("guid/$guid");
 
   my $req = HTTP::Request::Common::GET(
@@ -109,24 +115,6 @@ sub retrieve_fact {
   );
 
   $self->http_request($req);
-}
-
-sub search {
-  my ($self, $method, $args) = @_;
-
-  my $req_url = $self->abs_url("search/" . join('/', $method, @$args));
-
-  my $req = HTTP::Request::Common::GET(
-    $req_url,
-    'Accept' => 'application/json',
-  );
-
-  my $res = $self->http_request($req);
-
-  die { response => $res } unless $res->is_success;
-
-  my $results = JSON->new->allow_nonref(1)->decode($res->content);
-  return ref $results ? @$results : ();
 }
 
 sub abs_url {
