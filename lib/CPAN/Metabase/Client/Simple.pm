@@ -14,20 +14,54 @@ our $VERSION = '0.001';
 
 use HTTP::Request::Common ();
 use JSON;
-use Params::Validate;
 use LWP::UserAgent;
 use URI;
 
+# Stolen from ::Fact.
+# XXX: Should refactor this into something in Fact, which we can then rely on.
+# -- rjbs, 2009-03-30
+sub __validate_args {
+  my ($self, $args, $spec) = @_;
+  my $hash = (@$args == 1 and ref $args->[0]) ? { %{ $args->[0]  } }
+           : (@$args == 0)                    ? { }
+           :                                    { @$args };
+
+  my @errors;
+
+  for my $key (keys %$hash) {
+    push @errors, qq{unknown argument "$key" when constructing $self}
+      unless exists $spec->{ $key };
+  }
+  
+  for my $key (grep { $spec->{ $_ } } keys %$spec) {
+    push @errors, qq{missing required argument "$key" when constructing $self}
+      unless defined $hash->{ $key };
+  }
+  
+  Carp::confess(join qq{\n}, @errors) if @errors;
+  
+  return $hash;
+}
+
 my @valid_args;
-BEGIN { @valid_args = qw(user key url) }
-use Object::Tiny @valid_args;
+BEGIN {
+  @valid_args = qw(user key url);
+
+  for my $arg (@valid_args) {
+    no strict 'refs';
+    *$arg = sub { $_[0]->{$arg}; }
+  }
+}
 
 sub new {
   my ($class, @args) = @_;
 
-  my %args = Params::Validate::validate(@args, { map { $_ => 1 } @valid_args });
+  my $args = $class->__validate_args(
+    \@args,
+    { map { $_ => 1 } @valid_args }
+  );
 
-  my $self = bless \%args, $class;
+  my $self = bless $args => $class;
 
   return $self;
 }
