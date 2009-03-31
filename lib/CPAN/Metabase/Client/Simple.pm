@@ -32,14 +32,14 @@ sub __validate_args {
     push @errors, qq{unknown argument "$key" when constructing $self}
       unless exists $spec->{ $key };
   }
-  
+
   for my $key (grep { $spec->{ $_ } } keys %$spec) {
     push @errors, qq{missing required argument "$key" when constructing $self}
       unless defined $hash->{ $key };
   }
-  
+
   Carp::confess(join qq{\n}, @errors) if @errors;
-  
+
   return $hash;
 }
 
@@ -80,7 +80,9 @@ sub submit_fact {
   my $path = sprintf 'submit/%s', $fact->type;
 
   # XXX: should be $self->profile->guid
-  $fact->set_creator_id($self->profile->{metadata}{core}{guid}[1]);
+  # XXX: or $self->profile->resource? -- dagolden, 2009-03-31
+  $fact->set_creator_id($self->profile->guid)
+    unless $fact->creator_id;
 
   my $req_url = $self->abs_url($path);
 
