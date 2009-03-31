@@ -95,8 +95,15 @@ sub submit_fact {
   );
 
   my $res = $self->http_request($req);
-  Carp::confess("fact submission failed: " . $res->message)
-    unless $res->is_success;
+
+  unless ($res->is_success) {
+    if ($res->content_type eq 'application/json') {
+      my $entity = JSON->new->decode($res->content);
+      Carp::confess("fact submission failed: $entity->{error}");
+    } else {
+      Carp::confess("fact submission failed: " . $res->message)
+    }
+  }
 
   # This wil be something more informational later, like "accepted" or
   # "queued," maybe. -- rjbs, 2009-03-30
