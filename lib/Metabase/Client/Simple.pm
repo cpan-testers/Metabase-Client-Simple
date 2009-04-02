@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-package CPAN::Metabase::Client::Simple;
+package Metabase::Client::Simple;
 
 =head1 NAME
 
-CPAN::Metabase::Client::Simple - a client that submits to CPAN Metabase servers
+Metabase::Client::Simple - a client that submits to CPAN Metabase servers
 
 =cut
 
