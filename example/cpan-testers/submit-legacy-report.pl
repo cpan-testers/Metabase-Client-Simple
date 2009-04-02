@@ -2,8 +2,8 @@
 use strict;
 use warnings;
 
-use CPAN::Metabase::Client;
-use CPAN::Metabase::User::Profile;
+use Metabase::Client;
+use Metabase::User::Profile;
 use CPAN::Testers::Report;
 use CPAN::Testers::ParseReport;
 use Path::Class;
@@ -21,16 +21,16 @@ for my $f in ( @files ) {
 # create a user for submissions
 #--------------------------------------------------------------------------#
 
-my $profile = CPAN::Metabase::User::Profile->open(
+my $profile = Metabase::User::Profile->open(
   {
     resource => 'metabase:user:74B9A2EA-1D1A-11DE-BE21-DD62421C7A0A',
     guid     => '74B9A2EA-1D1A-11DE-BE21-DD62421C7A0A',
   }
 );
 
-$profile->add('CPAN::Metabase::User::EmailAddress' => 'jdoe@example.com');
-$profile->add('CPAN::Metabase::User::FullName'     => 'John Doe');
-$profile->add('CPAN::Metabase::User::Secret'       => 'aixuZuo8');
+$profile->add('Metabase::User::EmailAddress' => 'jdoe@example.com');
+$profile->add('Metabase::User::FullName'     => 'John Doe');
+$profile->add('Metabase::User::Secret'       => 'aixuZuo8');
 
 $profile->close;
 

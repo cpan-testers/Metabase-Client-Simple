@@ -6,7 +6,7 @@ package Metabase::Client::Simple;
 
 =head1 NAME
 
-Metabase::Client::Simple - a client that submits to CPAN Metabase servers
+Metabase::Client::Simple - a client that submits to Metabase servers
 
 =cut
 
