@@ -31,3 +31,6 @@
 \.swp$
 \.bak$
 ^pod.*\.tmp$
+
+# Private developer files
+^\.mylib
