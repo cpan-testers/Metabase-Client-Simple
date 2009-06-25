@@ -159,29 +159,6 @@ sub submit_fact {
   return 1;
 }
 
-sub retrieve_fact_raw {
-  my ($self, $guid) = @_;
-
-  # What do we want to do when you're asking for a fact /with your
-  # credentials/?  Let's say, for now, that you never do this...
-  # -- rjbs, 2009-03-30
-  my $req_url = $self->abs_url("guid/$guid");
-
-  my $req = HTTP::Request::Common::GET(
-    $req_url,
-    'Accept' => 'application/json',
-  );
-
-  my $res = $self->http_request($req);
-
-  Carp::confess("fact retrieval failed: " . $res->message)
-    unless $res->is_success;
-
-  my $json = $res->content;
-
-  JSON->new->decode($json);
-}
-
 sub _abs_url {
   my ($self, $str) = @_;
   my $req_url = URI->new($str)->abs($self->url);
