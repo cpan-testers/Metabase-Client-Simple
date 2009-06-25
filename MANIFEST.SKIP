@@ -34,3 +34,4 @@
 
 # Private developer files
 ^\.mylib
+^Metabase-Client-Simple-.*
