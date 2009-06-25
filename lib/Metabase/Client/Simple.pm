@@ -4,18 +4,41 @@ use warnings;
 
 package Metabase::Client::Simple;
 
-=head1 NAME
-
-Metabase::Client::Simple - a client that submits to Metabase servers
-
-=cut
-
 our $VERSION = '0.001';
 
 use HTTP::Request::Common ();
 use JSON;
 use LWP::UserAgent;
 use URI;
+
+=head1 NAME
+
+Metabase::Client::Simple - a client that submits to Metabase servers
+
+=head1 SYNOPSIS
+
+  use Metabase::Client::Simple;
+  use Metabase::User::Profile;
+
+  my $profile = Metabase::User::Profile->load('user-profile-file');
+
+  my $client = Metabase::Client::Simple->new({
+    profile => $profile,
+    url     => 'http://metabase.example.com/',
+  });
+
+  my $fact = generate_metabase_fact;
+
+  $client->submit_fact($fact);
+
+=head1 DESCRIPTION
+
+Metabase::Client::Simple provides is extremely simple, lightweight library for
+submitting facts to a L<Metabase|Metabase> web server.
+
+=head1 METHODS
+
+=cut
 
 # Stolen from ::Fact.
 # XXX: Should refactor this into something in Fact, which we can then rely on.
@@ -43,6 +66,19 @@ sub __validate_args {
   return $hash;
 }
 
+=head2 new
+
+  my $client = Metabase::Client::Simple->new(\%arg)
+
+This is the object constructor.
+
+Valid arguments are:
+
+  profile - a Metabase::User::Profile object
+  url     - the root URL for the metabase server
+
+=cut
+
 my @valid_args;
 BEGIN {
   @valid_args = qw(profile url);
@@ -66,13 +102,24 @@ sub new {
   return $self;
 }
 
-sub http_request {
+sub _http_request {
   my ($self, $request) = @_;
+
   # Blah blah blah, it would be nice to cache this and maybe do some of that
   # keepalive stuff that the cool kids are all talking about.
   # -- rjbs, 2009-03-30
   LWP::UserAgent->new->request($request);
 }
+
+=head2 submit_fact
+
+  $client->submit_fact($fact);
+
+This method will submit a L<Metabase::Fact|Metabase::Fact> object to the
+client's server.  On success, it will return a true value.  On failure, it will
+raise an exception.
+
+=cut
 
 sub submit_fact {
   my ($self, $fact) = @_;
@@ -84,7 +131,7 @@ sub submit_fact {
   $fact->set_creator_id($self->profile->guid)
     unless $fact->creator_id;
 
-  my $req_url = $self->abs_url($path);
+  my $req_url = $self->_abs_url($path);
 
   my $req = HTTP::Request::Common::POST(
     $req_url,
@@ -96,7 +143,7 @@ sub submit_fact {
     }),
   );
 
-  my $res = $self->http_request($req);
+  my $res = $self->_http_request($req);
 
   unless ($res->is_success) {
     if ($res->content_type eq 'application/json') {
@@ -135,7 +182,7 @@ sub retrieve_fact_raw {
   JSON->new->decode($json);
 }
 
-sub abs_url {
+sub _abs_url {
   my ($self, $str) = @_;
   my $req_url = URI->new($str)->abs($self->url);
 }
