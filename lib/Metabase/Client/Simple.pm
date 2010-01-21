@@ -19,11 +19,14 @@ Metabase::Client::Simple - a client that submits to Metabase servers
 
   use Metabase::Client::Simple;
   use Metabase::User::Profile;
+  use Metabase::User::Secret;
 
-  my $profile = Metabase::User::Profile->load('user-profile-file');
+  my $profile = Metabase::User::Profile->load('user.profile.json');
+  my $secret  = Metabase::User::Secret ->load('user.secret.json' );
 
   my $client = Metabase::Client::Simple->new({
     profile => $profile,
+    secret  => $secret,
     url     => 'http://metabase.example.com/',
   });
 
@@ -75,13 +78,14 @@ This is the object constructor.
 Valid arguments are:
 
   profile - a Metabase::User::Profile object
+  secret  - a Metabase::User::Secret object
   url     - the root URL for the metabase server
 
 =cut
 
 my @valid_args;
 BEGIN {
-  @valid_args = qw(profile url);
+  @valid_args = qw(profile secret url);
 
   for my $arg (@valid_args) {
     no strict 'refs';
@@ -140,6 +144,7 @@ sub submit_fact {
     Content      => JSON->new->encode({
       fact      => $fact->as_struct,
       submitter => $self->profile->as_struct,
+      secret    => $self->secret->as_struct,
     }),
   );
 
