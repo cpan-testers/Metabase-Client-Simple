@@ -130,9 +130,7 @@ sub submit_fact {
 
   my $path = sprintf 'submit/%s', $fact->type;
 
-  # XXX: should be $self->profile->guid
-  # XXX: or $self->profile->resource? -- dagolden, 2009-03-31
-  $fact->set_creator($self->profile->guid)
+  $fact->set_creator($self->profile->resource)
     unless $fact->creator;
 
   my $req_url = $self->_abs_url($path);
