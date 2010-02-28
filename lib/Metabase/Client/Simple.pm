@@ -149,12 +149,7 @@ sub submit_fact {
   my $res = $self->_http_request($req);
 
   unless ($res->is_success) {
-    if ($res->content_type eq 'application/json') {
-      my $entity = JSON->new->decode($res->content);
-      Carp::confess("fact submission failed: $entity->{error}");
-    } else {
-      Carp::confess("fact submission failed: " . $res->message)
-    }
+    Carp::confess $self->_error( $res => "fact submission failed" );
   }
 
   # This wil be something more informational later, like "accepted" or
@@ -165,6 +160,20 @@ sub submit_fact {
 sub _abs_url {
   my ($self, $str) = @_;
   my $req_url = URI->new($str)->abs($self->url);
+}
+
+sub _error {
+  my ($self, $res, $prefix) = @_;
+  $prefix ||= "unrecognized error";
+  if (
+    ref($res) && $res->can('content_type') 
+    && $res->content_type eq 'application/json'
+  ) {
+    my $entity = JSON->new->decode($res->content);
+    return "$prefix\: $entity->{error}";
+  } else {
+    return "$prefix\: " . $res->message;
+  }
 }
 
 =head1 LICENSE
