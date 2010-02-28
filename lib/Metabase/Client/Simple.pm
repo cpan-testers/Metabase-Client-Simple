@@ -187,7 +187,7 @@ sub _error {
   my ($self, $res, $prefix) = @_;
   $prefix ||= "unrecognized error";
   if (
-    ref($res) && $res->can('content_type') 
+    ref($res) && $res->can('content_type')
     && $res->content_type eq 'application/json'
   ) {
     my $entity = JSON->new->decode($res->content);
