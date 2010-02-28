@@ -162,6 +162,27 @@ sub _abs_url {
   my $req_url = URI->new($str)->abs($self->url);
 }
 
+sub register {
+  my ($self) = @_;
+
+  my $req_url = $self->_abs_url('register');
+
+  my $req = HTTP::Request::Common::POST(
+    $req_url,
+    Content_Type => 'application/json',
+    Accept       => 'application/json',
+    Content      => JSON->new->encode([$self->profile, $self->secret]),
+  );
+
+  my $res = $self->_http_request($req);
+
+  unless ($res->is_success) {
+    Carp::confess $self->_error( $res => "registration failed" );
+  }
+
+  return 1;
+}
+
 sub _error {
   my ($self, $res, $prefix) = @_;
   $prefix ||= "unrecognized error";
