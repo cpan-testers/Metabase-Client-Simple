@@ -114,7 +114,7 @@ sub submit_fact {
     Accept       => 'application/json',
     Content      => JSON->new->encode($fact->as_struct),
   );
-  $req->authorization_basic($self->profile->resource, $self->secret->content);
+  $req->authorization_basic($self->profile->resource->guid, $self->secret->content);
 
   my $res = $self->_http_request($req);
 
