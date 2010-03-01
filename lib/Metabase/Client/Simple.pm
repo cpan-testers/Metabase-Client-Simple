@@ -149,11 +149,11 @@ Note that a server error will also result in a false value.
 sub guid_exists {
   my ($self, $guid) = @_;
 
-  my $path = sprintf 'exists/%s', $guid;
+  my $path = sprintf 'guid/%s', $guid;
 
   my $req_url = $self->_abs_url($path);
 
-  my $req = HTTP::Request::Common::GET( $req_url );
+  my $req = HTTP::Request::Common::HEAD( $req_url );
 
   my $res = $self->_http_request($req);
 
