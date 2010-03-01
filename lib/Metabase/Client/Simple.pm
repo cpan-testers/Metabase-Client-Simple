@@ -78,6 +78,13 @@ sub new {
 
   my $self = bless $args => $class;
 
+  unless ( $self->profile->isa('Metabase::User::Profile') ) {
+    Carp::confess( "'profile' argument for $class must be a Metabase::User::Profile" );
+  }
+  unless ( $self->secret->isa('Metabase::User::Secret') ) {
+    Carp::confess( "'profile' argument for $class must be a Metabase::User::secret" );
+  }
+
   return $self;
 }
 
