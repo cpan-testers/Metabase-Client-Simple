@@ -6,6 +6,7 @@ package Metabase::Client::Simple;
 
 our $VERSION = '0.002';
 
+use HTTP::Status qw/:constants/; 
 use HTTP::Request::Common ();
 use JSON;
 use LWP::UserAgent;
@@ -42,32 +43,6 @@ submitting facts to a L<Metabase|Metabase> web server.
 =head1 METHODS
 
 =cut
-
-# Stolen from ::Fact.
-# XXX: Should refactor this into something in Fact, which we can then rely on.
-# -- rjbs, 2009-03-30
-sub __validate_args {
-  my ($self, $args, $spec) = @_;
-  my $hash = (@$args == 1 and ref $args->[0]) ? { %{ $args->[0]  } }
-           : (@$args == 0)                    ? { }
-           :                                    { @$args };
-
-  my @errors;
-
-  for my $key (keys %$hash) {
-    push @errors, qq{unknown argument "$key" when constructing $self}
-      unless exists $spec->{ $key };
-  }
-
-  for my $key (grep { $spec->{ $_ } } keys %$spec) {
-    push @errors, qq{missing required argument "$key" when constructing $self}
-      unless defined $hash->{ $key };
-  }
-
-  Carp::confess(join qq{\n}, @errors) if @errors;
-
-  return $hash;
-}
 
 =head2 new
 
@@ -106,15 +81,6 @@ sub new {
   return $self;
 }
 
-sub _http_request {
-  my ($self, $request) = @_;
-
-  # Blah blah blah, it would be nice to cache this and maybe do some of that
-  # keepalive stuff that the cool kids are all talking about.
-  # -- rjbs, 2009-03-30
-  LWP::UserAgent->new->request($request);
-}
-
 =head2 submit_fact
 
   $client->submit_fact($fact);
@@ -139,16 +105,22 @@ sub submit_fact {
     $req_url,
     Content_Type => 'application/json',
     Accept       => 'application/json',
-    Content      => JSON->new->encode({
-      fact      => $fact->as_struct,
-      submitter => $self->profile->as_struct,
-      secret    => $self->secret->as_struct,
-    }),
+    Content      => JSON->new->encode($fact->as_struct),
   );
+  $req->authorization_basic($self->profile->resource, $self->secret->content);
 
   my $res = $self->_http_request($req);
 
-  unless ($res->is_success) {
+  if ($res->code == HTTP_UNAUTHORIZED) {
+    if ( $self->guid_exists( $self->profile->guid ) ) {
+      Carp::confess $self->_error( $res => "authentication failed" );
+    }
+    $self->register; # dies on failure
+    # should now be registered so try again
+    $res = $self->_http_request($req);
+  }
+
+  unless ( $res->is_success ) {
     Carp::confess $self->_error( $res => "fact submission failed" );
   }
 
@@ -157,10 +129,40 @@ sub submit_fact {
   return 1;
 }
 
-sub _abs_url {
-  my ($self, $str) = @_;
-  my $req_url = URI->new($str)->abs($self->url);
+=head2 guid_exists
+
+  $client->guid_exists('2f8519c6-24cf-11df-90b1-0018f34ec37c');
+
+This method will check whether the given GUID is found on the metabase server.
+The GUID must be in lower-case, string form.  It will return true or false.
+Note that a server error will also result in a false value.
+
+=cut
+
+sub guid_exists {
+  my ($self, $guid) = @_;
+
+  my $path = sprintf 'exists/%s', $guid;
+
+  my $req_url = $self->_abs_url($path);
+
+  my $req = HTTP::Request::Common::GET( $req_url );
+
+  my $res = $self->_http_request($req);
+
+  return $res->is_success ? 1 : 0;
 }
+
+=head2 register
+
+  $client->register;
+
+This method will submit the user credentials to the metabase server.  It will
+be called automatically by C<submit_fact> if necessary.   You generally won't
+need to use it.  On success, it will return a true value.  On failure, it will
+raise an exception.
+
+=cut
 
 sub register {
   my ($self) = @_;
@@ -183,6 +185,50 @@ sub register {
   return 1;
 }
 
+#--------------------------------------------------------------------------#
+# private methods
+#--------------------------------------------------------------------------#
+
+# Stolen from ::Fact.
+# XXX: Should refactor this into something in Fact, which we can then rely on.
+# -- rjbs, 2009-03-30
+sub __validate_args {
+  my ($self, $args, $spec) = @_;
+  my $hash = (@$args == 1 and ref $args->[0]) ? { %{ $args->[0]  } }
+           : (@$args == 0)                    ? { }
+           :                                    { @$args };
+
+  my @errors;
+
+  for my $key (keys %$hash) {
+    push @errors, qq{unknown argument "$key" when constructing $self}
+      unless exists $spec->{ $key };
+  }
+
+  for my $key (grep { $spec->{ $_ } } keys %$spec) {
+    push @errors, qq{missing required argument "$key" when constructing $self}
+      unless defined $hash->{ $key };
+  }
+
+  Carp::confess(join qq{\n}, @errors) if @errors;
+
+  return $hash;
+}
+
+sub _http_request {
+  my ($self, $request) = @_;
+
+  # Blah blah blah, it would be nice to cache this and maybe do some of that
+  # keepalive stuff that the cool kids are all talking about.
+  # -- rjbs, 2009-03-30
+  LWP::UserAgent->new->request($request);
+}
+
+sub _abs_url {
+  my ($self, $str) = @_;
+  my $req_url = URI->new($str)->abs($self->url);
+}
+
 sub _error {
   my ($self, $res, $prefix) = @_;
   $prefix ||= "unrecognized error";
@@ -199,7 +245,8 @@ sub _error {
 
 =head1 LICENSE
 
-Copyright (C) 2008, Ricardo SIGNES.
+Portions Copyright (C) 2008 by Ricardo SIGNES
+Portions Copyright (C) 2009-2010 by David Golden
 
 This is free software, available under the same terms as perl itself.
 
