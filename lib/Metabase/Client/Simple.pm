@@ -180,7 +180,9 @@ sub register {
     $req_url,
     Content_Type => 'application/json',
     Accept       => 'application/json',
-    Content      => JSON->new->encode([$self->profile, $self->secret]),
+    Content      => JSON->new->encode([
+      $self->profile->as_struct, $self->secret->as_struct
+    ]),
   );
 
   my $res = $self->_http_request($req);
@@ -239,10 +241,7 @@ sub _abs_url {
 sub _error {
   my ($self, $res, $prefix) = @_;
   $prefix ||= "unrecognized error";
-  if (
-    ref($res) && $res->can('content_type')
-    && $res->content_type eq 'application/json'
-  ) {
+  if ( ref($res) && $res->header('Content-Type') eq 'application/json') {
     my $entity = JSON->new->decode($res->content);
     return "$prefix\: $entity->{error}";
   } else {
