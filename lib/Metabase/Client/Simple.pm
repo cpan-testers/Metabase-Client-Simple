@@ -176,6 +176,11 @@ sub register {
 
   my $req_url = $self->_abs_url('register');
 
+  for my $type ( qw/profile secret/ ) {
+    $self->$type->set_creator( $self->$type->resource) 
+      unless $self->$type->creator;
+  }
+
   my $req = HTTP::Request::Common::POST(
     $req_url,
     Content_Type => 'application/json',
