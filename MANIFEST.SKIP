@@ -1,4 +1,4 @@
-# Copyright (c) 2008 by Ricardo SIGNES. All rights reserved.
+# Copyright (c) 2008 by Ricardo Signes. All rights reserved.
 # Licensed under terms of Perl itself (the "License").
 # You may not use this file except in compliance with the License.
 # A copy of the License was distributed with this file or you may obtain a 
@@ -17,13 +17,16 @@
 ^blib/
 ^blibdirs$
 ^PM_to_blib$
+^pm_to_blib$
 ^MakeMaker-\d
 ^Build$
 ^_build
 ^cover_db
 ^.*\.bat$
+^META.yml
 
 # Temp, old, vi and emacs files.
+^eg/
 ~$
 \.old$
 \#\.*\#$
@@ -34,4 +37,4 @@
 
 # Private developer files
 ^\.mylib
-^Metabase-Client-Simple-.*
+^Metabase-.*
