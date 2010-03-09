@@ -4,7 +4,7 @@ use warnings;
 
 package Metabase::Client::Simple;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use HTTP::Status qw/:constants/; 
 use HTTP::Request::Common ();
