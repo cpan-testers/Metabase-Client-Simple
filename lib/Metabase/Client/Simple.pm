@@ -28,7 +28,7 @@ Metabase::Client::Simple - a client that submits to Metabase servers
   my $client = Metabase::Client::Simple->new({
     profile => $profile,
     secret  => $secret,
-    url     => 'http://metabase.example.com/',
+    uri     => 'http://metabase.example.com/',
   });
 
   my $fact = generate_metabase_fact;
@@ -54,13 +54,13 @@ Valid arguments are:
 
   profile - a Metabase::User::Profile object
   secret  - a Metabase::User::Secret object
-  url     - the root URL for the metabase server
+  uri     - the root URI for the metabase server
 
 =cut
 
 my @valid_args;
 BEGIN {
-  @valid_args = qw(profile secret url);
+  @valid_args = qw(profile secret uri);
 
   for my $arg (@valid_args) {
     no strict 'refs';
@@ -106,10 +106,10 @@ sub submit_fact {
   $fact->set_creator($self->profile->resource)
     unless $fact->creator;
 
-  my $req_url = $self->_abs_url($path);
+  my $req_uri = $self->_abs_uri($path);
 
   my $req = HTTP::Request::Common::POST(
-    $req_url,
+    $req_uri,
     Content_Type => 'application/json',
     Accept       => 'application/json',
     Content      => JSON->new->encode($fact->as_struct),
@@ -151,9 +151,9 @@ sub guid_exists {
 
   my $path = sprintf 'guid/%s', $guid;
 
-  my $req_url = $self->_abs_url($path);
+  my $req_uri = $self->_abs_uri($path);
 
-  my $req = HTTP::Request::Common::HEAD( $req_url );
+  my $req = HTTP::Request::Common::HEAD( $req_uri );
 
   my $res = $self->_http_request($req);
 
@@ -174,7 +174,7 @@ raise an exception.
 sub register {
   my ($self) = @_;
 
-  my $req_url = $self->_abs_url('register');
+  my $req_uri = $self->_abs_uri('register');
 
   for my $type ( qw/profile secret/ ) {
     $self->$type->set_creator( $self->$type->resource) 
@@ -182,7 +182,7 @@ sub register {
   }
 
   my $req = HTTP::Request::Common::POST(
-    $req_url,
+    $req_uri,
     Content_Type => 'application/json',
     Accept       => 'application/json',
     Content      => JSON->new->encode([
@@ -238,9 +238,9 @@ sub _http_request {
   LWP::UserAgent->new->request($request);
 }
 
-sub _abs_url {
+sub _abs_uri {
   my ($self, $str) = @_;
-  my $req_url = URI->new($str)->abs($self->url);
+  my $req_uri = URI->new($str)->abs($self->uri);
 }
 
 sub _error {
