@@ -1,0 +1,9 @@
+Revision history for Metabase-Client_Simple
+
+0.004 -
+
+  Changes:
+
+  - Changed 'url' parameter to 'uri' for consistency with other
+    Metabase framework components
+
