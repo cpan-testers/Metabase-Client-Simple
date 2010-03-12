@@ -1,8 +1,10 @@
 Revision history for Metabase-Client_Simple
 
+0.005 Thu Mar 11 23:33:57 EST 2010
+
   - Added Net::SSL to prereqs to ensure LWP can speak https
 
-0.004 -
+0.004 
 
   - Changed 'url' parameter to 'uri' for consistency with other
     Metabase framework components
