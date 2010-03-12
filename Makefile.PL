@@ -3,6 +3,12 @@ use inc::Module::Install;
 name('Metabase-Client-Simple');
 all_from('lib/Metabase/Client/Simple.pm');
 
+#--------------------------------------------------------------------------#
+# make sure LWP::UserAgent has Net::SSL for https transport
+requires      ('Net::SSL'                     => 0       );
+
+#--------------------------------------------------------------------------#  
+
 requires      ('HTTP::Request::Common'        => 5.824   );
 requires      ('HTTP::Status'                 => 5.817   );
 requires      ('JSON'                         => 2.17    );
