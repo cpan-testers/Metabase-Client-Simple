@@ -2,6 +2,8 @@ Revision history for Metabase-Client-Simple
 
 {{$NEXT}}
 
+0.006     2010-03-29 15:22:22 EST5EDT
+
   - Ensure JSON uses ASCII encoding
 
 0.005 Thu Mar 11 23:33:57 EST 2010
