@@ -1,5 +1,7 @@
 Revision history for Metabase-Client_Simple
 
+  - Ensure JSON uses ASCII encoding
+
 0.005 Thu Mar 11 23:33:57 EST 2010
 
   - Added Net::SSL to prereqs to ensure LWP can speak https
