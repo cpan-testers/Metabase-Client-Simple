@@ -225,6 +225,8 @@ sub _error {
 
 __END__
 
+=for Pod::Coverage profile secret uri
+
 =head1 SYNOPSIS
 
   use Metabase::Client::Simple;
