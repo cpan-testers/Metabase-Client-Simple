@@ -13,4 +13,4 @@ MANIFEST
 inc
 /*.tar.gz
 /.build
-/Metabase-Client-Simple-
+/Metabase-Client-Simple-*
