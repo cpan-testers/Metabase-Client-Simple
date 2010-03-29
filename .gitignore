@@ -12,3 +12,5 @@ MANIFEST
 !MANIFEST.SKIP
 inc
 /*.tar.gz
+/.build
+/Metabase-Client-Simple-
