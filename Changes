@@ -1,4 +1,6 @@
-Revision history for Metabase-Client_Simple
+Revision history for Metabase-Client-Simple
+
+{{$NEXT}}
 
   - Ensure JSON uses ASCII encoding
 

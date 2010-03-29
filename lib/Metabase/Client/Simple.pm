@@ -3,8 +3,7 @@ use strict;
 use warnings;
 
 package Metabase::Client::Simple;
-
-our $VERSION = '0.005';
+# ABSTRACT: a client that submits to Metabase servers
 
 use HTTP::Status qw/:constants/; 
 use HTTP::Request::Common ();
@@ -12,39 +11,17 @@ use JSON 2 ();
 use LWP::UserAgent;
 use URI;
 
-=head1 NAME
+my @valid_args;
+BEGIN {
+  @valid_args = qw(profile secret uri);
 
-Metabase::Client::Simple - a client that submits to Metabase servers
+  for my $arg (@valid_args) {
+    no strict 'refs';
+    *$arg = sub { $_[0]->{$arg}; }
+  }
+}
 
-=head1 SYNOPSIS
-
-  use Metabase::Client::Simple;
-  use Metabase::User::Profile;
-  use Metabase::User::Secret;
-
-  my $profile = Metabase::User::Profile->load('user.profile.json');
-  my $secret  = Metabase::User::Secret ->load('user.secret.json' );
-
-  my $client = Metabase::Client::Simple->new({
-    profile => $profile,
-    secret  => $secret,
-    uri     => 'http://metabase.example.com/',
-  });
-
-  my $fact = generate_metabase_fact;
-
-  $client->submit_fact($fact);
-
-=head1 DESCRIPTION
-
-Metabase::Client::Simple provides is extremely simple, lightweight library for
-submitting facts to a L<Metabase|Metabase> web server.
-
-=head1 METHODS
-
-=cut
-
-=head2 new
+=method new
 
   my $client = Metabase::Client::Simple->new(\%arg)
 
@@ -57,16 +34,6 @@ Valid arguments are:
   uri     - the root URI for the metabase server
 
 =cut
-
-my @valid_args;
-BEGIN {
-  @valid_args = qw(profile secret uri);
-
-  for my $arg (@valid_args) {
-    no strict 'refs';
-    *$arg = sub { $_[0]->{$arg}; }
-  }
-}
 
 sub new {
   my ($class, @args) = @_;
@@ -88,7 +55,7 @@ sub new {
   return $self;
 }
 
-=head2 submit_fact
+=method submit_fact
 
   $client->submit_fact($fact);
 
@@ -136,7 +103,7 @@ sub submit_fact {
   return 1;
 }
 
-=head2 guid_exists
+=method guid_exists
 
   $client->guid_exists('2f8519c6-24cf-11df-90b1-0018f34ec37c');
 
@@ -160,7 +127,7 @@ sub guid_exists {
   return $res->is_success ? 1 : 0;
 }
 
-=head2 register
+=method register
 
   $client->register;
 
@@ -254,13 +221,34 @@ sub _error {
   }
 }
 
-=head1 LICENSE
+1;
 
-Portions Copyright (C) 2008 by Ricardo SIGNES
-Portions Copyright (C) 2009-2010 by David Golden
+__END__
 
-This is free software, available under the same terms as perl itself.
+=head1 SYNOPSIS
+
+  use Metabase::Client::Simple;
+  use Metabase::User::Profile;
+  use Metabase::User::Secret;
+
+  my $profile = Metabase::User::Profile->load('user.profile.json');
+  my $secret  = Metabase::User::Secret ->load('user.secret.json' );
+
+  my $client = Metabase::Client::Simple->new({
+    profile => $profile,
+    secret  => $secret,
+    uri     => 'http://metabase.example.com/',
+  });
+
+  my $fact = generate_metabase_fact;
+
+  $client->submit_fact($fact);
+
+=head1 DESCRIPTION
+
+Metabase::Client::Simple provides is extremely simple, lightweight library for
+submitting facts to a L<Metabase|Metabase> web server.
 
 =cut
 
-1;
+
