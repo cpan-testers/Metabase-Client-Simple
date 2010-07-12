@@ -43,6 +43,9 @@ sub new {
     { map { $_ => 1 } @valid_args }
   );
 
+  # uri must have a trailing slash
+  $args->{uri} .= "/" unless substr($args->{uri}, -1) eq '/';
+
   my $self = bless $args => $class;
 
   unless ( $self->profile->isa('Metabase::User::Profile') ) {
