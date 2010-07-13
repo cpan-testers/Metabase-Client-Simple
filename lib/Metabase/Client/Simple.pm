@@ -8,7 +8,7 @@ package Metabase::Client::Simple;
 use HTTP::Status qw/:constants/;
 use HTTP::Request::Common ();
 use JSON 2 ();
-use LWP::UserAgent;
+use LWP::UserAgent 5.54 (); # keep_alive
 use URI;
 
 my @valid_args;
