@@ -2,6 +2,12 @@ Revision history for Metabase-Client-Simple
 
 {{$NEXT}}
 
+  - Supports proxies from the environment
+  
+  - Caches LWP::UserAgent and uses keep_alive
+
+  - Some minimal testing added
+
 0.007     2010-07-12 16:43:30 EST5EDT
 
   - Ensure 'uri' argument has a trailing slash
