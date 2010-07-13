@@ -33,3 +33,11 @@ is( $client->_ua->agent, "Metabase::Client::Simple/$ver " . $client->_ua->_agent
   "UA agent string set correctly"
 );
 
+#--------------------------------------------------------------------------#
+# No trailing slash
+#--------------------------------------------------------------------------#
+
+$args->{uri} = 'http://metabase.example.com',
+$client = new_ok( 'Metabase::Client::Simple', [ $args ] );
+is( $client->uri, 'http://metabase.example.com/', "Trailing slash added" );
+
