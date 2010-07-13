@@ -58,6 +58,18 @@ sub new {
   return $self;
 }
 
+sub _ua {
+  my ($self) = @_;
+  if ( ! $self->{_ua} ) {
+    $self->{_ua} = LWP::UserAgent->new(
+      agent => __PACKAGE__ . "/" . __PACKAGE__->VERSION . " " . $self->_agent,
+      env_proxy => 1,
+      keep_alive => 5,
+    );
+  }
+  return $self->{_ua};
+}
+
 =method submit_fact
 
   $client->submit_fact($fact);
@@ -86,7 +98,7 @@ sub submit_fact {
   );
   $req->authorization_basic($self->profile->resource->guid, $self->secret->content);
 
-  my $res = $self->_http_request($req);
+  my $res = $self->_ua->request($req);
 
   if ($res->code == HTTP_UNAUTHORIZED) {
     if ( $self->guid_exists( $self->profile->guid ) ) {
@@ -94,7 +106,7 @@ sub submit_fact {
     }
     $self->register; # dies on failure
     # should now be registered so try again
-    $res = $self->_http_request($req);
+    $res = $self->_ua->request($req);
   }
 
   unless ( $res->is_success ) {
@@ -125,7 +137,7 @@ sub guid_exists {
 
   my $req = HTTP::Request::Common::HEAD( $req_uri );
 
-  my $res = $self->_http_request($req);
+  my $res = $self->_ua->request($req);
 
   return $res->is_success ? 1 : 0;
 }
@@ -160,7 +172,7 @@ sub register {
     ]),
   );
 
-  my $res = $self->_http_request($req);
+  my $res = $self->_ua->request($req);
 
   unless ($res->is_success) {
     Carp::confess $self->_error( $res => "registration failed" );
@@ -197,19 +209,6 @@ sub __validate_args {
   Carp::confess(join qq{\n}, @errors) if @errors;
 
   return $hash;
-}
-
-sub _http_request {
-  my ($self, $request) = @_;
-
-  if ( ! $self->{_ua} ) {
-    $self->{_ua} = LWP::UserAgent->new(
-      agent => __PACKAGE__ . "/" . __PACKAGE__->VERSION . " " . $self->_agent,
-      env_proxy => 1,
-      keep_alive => 5,
-    );
-  }
-  return $self->{_ua}->request($request);
 }
 
 sub _abs_uri {
