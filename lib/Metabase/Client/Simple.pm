@@ -62,7 +62,7 @@ sub _ua {
   my ($self) = @_;
   if ( ! $self->{_ua} ) {
     $self->{_ua} = LWP::UserAgent->new(
-      agent => __PACKAGE__ . "/" . __PACKAGE__->VERSION . " " . $self->_agent,
+      agent => __PACKAGE__ . "/" . __PACKAGE__->VERSION . " ",
       env_proxy => 1,
       keep_alive => 5,
     );
