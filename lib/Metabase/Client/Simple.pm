@@ -5,7 +5,7 @@ use warnings;
 package Metabase::Client::Simple;
 # ABSTRACT: a client that submits to Metabase servers
 
-use HTTP::Status qw/:constants/; 
+use HTTP::Status qw/:constants/;
 use HTTP::Request::Common ();
 use JSON 2 ();
 use LWP::UserAgent;
@@ -147,7 +147,7 @@ sub register {
   my $req_uri = $self->_abs_uri('register');
 
   for my $type ( qw/profile secret/ ) {
-    $self->$type->set_creator( $self->$type->resource) 
+    $self->$type->set_creator( $self->$type->resource)
       unless $self->$type->creator;
   }
 
