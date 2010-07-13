@@ -3,10 +3,14 @@ Revision history for Metabase-Client-Simple
 {{$NEXT}}
 
   - Supports proxies from the environment
-  
+
   - Caches LWP::UserAgent and uses keep_alive
 
   - Some minimal testing added
+
+  - Dependency on Net::SSL was removed in 0.007, but
+    now checks that a scheme (e.g. 'https') is supported or
+    dies with a useful message
 
 0.007     2010-07-12 16:43:30 EST5EDT
 
@@ -20,7 +24,7 @@ Revision history for Metabase-Client-Simple
 
   - Added Net::SSL to prereqs to ensure LWP can speak https
 
-0.004 
+0.004
 
   - Changed 'url' parameter to 'uri' for consistency with other
     Metabase framework components
