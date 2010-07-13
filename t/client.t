@@ -41,3 +41,12 @@ $args->{uri} = 'http://metabase.example.com',
 $client = new_ok( 'Metabase::Client::Simple', [ $args ] );
 is( $client->uri, 'http://metabase.example.com/', "Trailing slash added" );
 
+#--------------------------------------------------------------------------#-
+# Bad scheme
+#--------------------------------------------------------------------------#
+
+$args->{uri} = 'fake://metabase.example.com/';
+eval { Metabase::Client::Simple->new( $args ) };
+like( $@, qr/Scheme 'fake' is not supported by your LWP::UserAgent/,
+  "Bad scheme causes new() to die"
+);

@@ -33,6 +33,9 @@ Valid arguments are:
   secret  - a Metabase::User::Secret object
   uri     - the root URI for the metabase server
 
+If you use a C<uri> argument with the 'https' scheme, you must have
+Crypt::SSLeay or IO::Socket::SSL installed.
+
 =cut
 
 sub new {
@@ -53,6 +56,15 @@ sub new {
   }
   unless ( $self->secret->isa('Metabase::User::Secret') ) {
     Carp::confess( "'profile' argument for $class must be a Metabase::User::secret" );
+  }
+
+  my $scheme = URI->new( $self->uri )->scheme;
+  unless ( $self->_ua->is_protocol_supported( $scheme ) ) {
+    my $msg = "Scheme '$scheme' is not supported by your LWP::UserAgent.\n";
+    if ( $scheme eq 'https' ) {
+      $msg .= "You must install Crypt::SSLeay or IO::Socket::SSL or use http instead.\n";
+    }
+    die $msg;
   }
 
   return $self;
