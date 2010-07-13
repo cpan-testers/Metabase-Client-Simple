@@ -2,15 +2,16 @@ Revision history for Metabase-Client-Simple
 
 {{$NEXT}}
 
-  - Supports proxies from the environment
+  - Supports HTTP proxy environment variables
 
   - Caches LWP::UserAgent and uses keep_alive
 
   - Some minimal testing added
 
-  - Dependency on Net::SSL was removed in 0.007, but
+  - Dependency on Net::SSL was removed in 0.007, but we
     now checks that a scheme (e.g. 'https') is supported or
-    dies with a useful message
+    else die with a useful message about installing deps or
+    using 'http' instead
 
 0.007     2010-07-12 16:43:30 EST5EDT
 
