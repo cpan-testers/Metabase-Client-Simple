@@ -202,10 +202,14 @@ sub __validate_args {
 sub _http_request {
   my ($self, $request) = @_;
 
-  # Blah blah blah, it would be nice to cache this and maybe do some of that
-  # keepalive stuff that the cool kids are all talking about.
-  # -- rjbs, 2009-03-30
-  LWP::UserAgent->new->request($request);
+  if ( ! $self->{_ua} ) {
+    $self->{_ua} = LWP::UserAgent->new(
+      agent => __PACKAGE__ . "/" . __PACKAGE__->VERSION . " " . $self->_agent,
+      env_proxy => 1,
+      keep_alive => 5,
+    );
+  }
+  return $self->{_ua}->request($request);
 }
 
 sub _abs_uri {
