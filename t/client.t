@@ -6,7 +6,7 @@ use JSON 2 ();
 use Metabase::User::Profile ();
 use Metabase::User::Secret ();
 
-use Test::More 0.88;
+use Test::More 0.88; END { done_testing }
 
 require_ok('Metabase::Client::Simple');
 
@@ -33,4 +33,3 @@ is( $client->_ua->agent, "Metabase::Client::Simple/$ver " . $client->_ua->_agent
   "UA agent string set correctly"
 );
 
-done_testing;
