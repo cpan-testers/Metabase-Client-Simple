@@ -2,6 +2,8 @@ Revision history for Metabase-Client-Simple
 
 {{$NEXT}}
 
+0.009     2012-07-24 23:09:55 America/New_York
+
   - Note need for LWP::Protocol::https
 
 0.008     2010-07-13 11:21:08 EST5EDT
