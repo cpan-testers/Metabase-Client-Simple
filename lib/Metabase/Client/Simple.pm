@@ -34,7 +34,7 @@ Valid arguments are:
   uri     - the root URI for the metabase server
 
 If you use a C<uri> argument with the 'https' scheme, you must have
-Crypt::SSLeay or IO::Socket::SSL installed.
+L<LWP::Protocol::https> installed.
 
 =cut
 
