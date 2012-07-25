@@ -1,0 +1,78 @@
+{
+   "abstract" : "a client that submits to Metabase servers",
+   "author" : [
+      "David Golden <dagolden@cpan.org>",
+      "Ricardo Signes <rjbs@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Metabase-Client-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "2",
+            "LWP::UserAgent" : "5.54",
+            "URI" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Metabase::User::Profile" : "0",
+            "Metabase::User::Secret" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Metabase::Client::Simple" : {
+         "file" : "lib/Metabase/Client/Simple.pm",
+         "version" : "0.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-metabase-client-simple at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Metabase-Client-Simple"
+      },
+      "homepage" : "https://github.com/dagolden/metabase-client-simple",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/metabase-client-simple.git",
+         "web" : "https://github.com/dagolden/metabase-client-simple"
+      }
+   },
+   "version" : "0.009"
+}
+
