@@ -6,7 +6,7 @@ package Metabase::Client::Simple;
 # ABSTRACT: a client that submits to Metabase servers
 # VERSION
 
-use HTTP::Status qw/:constants/;
+use HTTP::Status 5.817 qw/:constants/;
 use HTTP::Request::Common ();
 use JSON 2 ();
 use LWP::UserAgent 5.54 (); # keep_alive
