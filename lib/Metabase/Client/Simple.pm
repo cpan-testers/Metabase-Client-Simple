@@ -126,7 +126,7 @@ sub submit_fact {
     Carp::confess $self->_error( $res => "fact submission failed" );
   }
 
-  # This wil be something more informational later, like "accepted" or
+  # This will be something more informational later, like "accepted" or
   # "queued," maybe. -- rjbs, 2009-03-30
   return 1;
 }
