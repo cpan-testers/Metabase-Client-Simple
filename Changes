@@ -2,6 +2,8 @@ Revision history for Metabase-Client-Simple
 
 {{$NEXT}}
 
+  - Updated distribution metadata (repo, bugtracker, etc.)
+
 0.009     2012-07-24 23:09:55 America/New_York
 
   - Note need for LWP::Protocol::https
