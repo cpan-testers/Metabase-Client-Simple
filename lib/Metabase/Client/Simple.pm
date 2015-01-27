@@ -5,7 +5,7 @@ use warnings;
 package Metabase::Client::Simple;
 # ABSTRACT: a client that submits to Metabase servers
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use HTTP::Status 5.817 qw/:constants/;
 use HTTP::Request::Common ();
