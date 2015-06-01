@@ -8,9 +8,8 @@ package Metabase::Client::Simple;
 our $VERSION = '0.011';
 
 use HTTP::Status 5.817 qw/:constants/;
-use HTTP::Request::Common ();
 use JSON 2 ();
-use LWP::UserAgent 5.54 (); # keep_alive
+use HTTP::Tiny 0.056; # can_ssl
 use URI;
 
 my @valid_args;
@@ -37,7 +36,7 @@ Valid arguments are:
   uri     - the root URI for the metabase server
 
 If you use a C<uri> argument with the 'https' scheme, you must have
-L<LWP::Protocol::https> installed.
+L<IO::Socket::SSL> and L<Net::SSLeay> installed.
 
 =cut
 
@@ -59,10 +58,11 @@ sub new {
     }
 
     my $scheme = URI->new( $self->uri )->scheme;
-    unless ( $self->_ua->is_protocol_supported($scheme) ) {
-        my $msg = "Scheme '$scheme' is not supported by your LWP::UserAgent.\n";
+    my ( $can_ssl, $reason ) = HTTP::Tiny::can_ssl();
+    unless ( $scheme eq 'http' || ( $scheme eq 'https' && $can_ssl ) ) {
+        my $msg = "Scheme '$scheme' is not supported.\n";
         if ( $scheme eq 'https' ) {
-            $msg .= "You must install Crypt::SSLeay or IO::Socket::SSL or use http instead.\n";
+            $msg .= $reason;
         }
         die $msg;
     }
@@ -73,11 +73,8 @@ sub new {
 sub _ua {
     my ($self) = @_;
     if ( !$self->{_ua} ) {
-        $self->{_ua} = LWP::UserAgent->new(
-            agent      => __PACKAGE__ . "/" . __PACKAGE__->VERSION . " ",
-            env_proxy  => 1,
-            keep_alive => 5,
-        );
+        $self->{_ua} =
+          HTTP::Tiny->new( agent => __PACKAGE__ . "/" . __PACKAGE__->VERSION . " ", );
     }
     return $self->{_ua};
 }
@@ -102,26 +99,29 @@ sub submit_fact {
 
     my $req_uri = $self->_abs_uri($path);
 
-    my $req = HTTP::Request::Common::POST(
+    my @req = (
         $req_uri,
-        Content_Type => 'application/json',
-        Accept       => 'application/json',
-        Content      => JSON->new->ascii->encode( $fact->as_struct ),
+        {
+            headers => (
+                Content_Type => 'application/json',
+                Accept       => 'application/json',
+                Content      => JSON->new->ascii->encode( $fact->as_struct ),
+            )
+        },
     );
-    $req->authorization_basic( $self->profile->resource->guid, $self->secret->content );
 
-    my $res = $self->_ua->request($req);
+    my $res = $self->_ua->post(@req);
 
-    if ( $res->code == HTTP_UNAUTHORIZED ) {
+    if ( $res->{status} == HTTP_UNAUTHORIZED ) {
         if ( $self->guid_exists( $self->profile->guid ) ) {
             Carp::confess $self->_error( $res => "authentication failed" );
         }
         $self->register; # dies on failure
         # should now be registered so try again
-        $res = $self->_ua->request($req);
+        $res = $self->_ua->post(@req);
     }
 
-    unless ( $res->is_success ) {
+    unless ( $res->{success} ) {
         Carp::confess $self->_error( $res => "fact submission failed" );
     }
 
@@ -147,11 +147,9 @@ sub guid_exists {
 
     my $req_uri = $self->_abs_uri($path);
 
-    my $req = HTTP::Request::Common::HEAD($req_uri);
+    my $res = $self->_ua->head($req_uri);
 
-    my $res = $self->_ua->request($req);
-
-    return $res->is_success ? 1 : 0;
+    return $res->{success};
 }
 
 =method register
@@ -175,18 +173,20 @@ sub register {
           unless $self->$type->creator;
     }
 
-    my $req = HTTP::Request::Common::POST(
+    my @req = (
         $req_uri,
-        Content_Type => 'application/json',
-        Accept       => 'application/json',
-        Content      => JSON->new->ascii->encode(
-            [ $self->profile->as_struct, $self->secret->as_struct ]
-        ),
+        headers => {
+            Content_Type => 'application/json',
+            Accept       => 'application/json',
+            Content      => JSON->new->ascii->encode(
+                [ $self->profile->as_struct, $self->secret->as_struct ]
+            ),
+        },
     );
 
-    my $res = $self->_ua->request($req);
+    my $res = $self->_ua->post(@req);
 
-    unless ( $res->is_success ) {
+    unless ( $res->{success} ) {
         Carp::confess $self->_error( $res => "registration failed" );
     }
 
@@ -232,12 +232,12 @@ sub _abs_uri {
 sub _error {
     my ( $self, $res, $prefix ) = @_;
     $prefix ||= "unrecognized error";
-    if ( ref($res) && $res->header('Content-Type') eq 'application/json' ) {
-        my $entity = JSON->new->ascii->decode( $res->content );
+    if ( ref($res) && $res->{headers}{'content-type'} eq 'application/json' ) {
+        my $entity = JSON->new->ascii->decode( $res->{content} );
         return "$prefix\: $entity->{error}";
     }
     else {
-        return "$prefix\: " . $res->message;
+        return "$prefix\: " . $res->{reason};
     }
 }
 
