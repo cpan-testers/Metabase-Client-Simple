@@ -52,6 +52,6 @@ $args->{uri} = 'fake://metabase.example.com/';
 eval { Metabase::Client::Simple->new($args) };
 like(
     $@,
-    qr/Scheme 'fake' is not supported by your LWP::UserAgent/,
+    qr/Scheme 'fake' is not supported/,
     "Bad scheme causes new() to die"
 );
