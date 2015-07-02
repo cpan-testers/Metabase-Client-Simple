@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use File::Spec ();
-use JSON 2 ();
+use JSON::MaybeXS;
 use Metabase::User::Profile ();
 use Metabase::User::Secret  ();
 
@@ -17,7 +17,7 @@ my $ver = Metabase::Client::Simple->VERSION;
 
 my $id_file = File::Spec->catfile(qw/t data id.json/);
 my $guts    = do { local ( @ARGV, $/ ) = $id_file; <> };
-my $id_pair = JSON->new->decode($guts);
+my $id_pair = JSON()->new->decode($guts);
 
 my $profile = Metabase::User::Profile->from_struct( $id_pair->[0] );
 my $secret  = Metabase::User::Secret->from_struct( $id_pair->[1] );
