@@ -9,7 +9,7 @@ our $VERSION = '0.011';
 
 use HTTP::Status 5.817 qw/:constants/;
 use HTTP::Request::Common ();
-use JSON 2 ();
+use JSON::MaybeXS;
 use LWP::UserAgent 5.54 (); # keep_alive
 use URI;
 
@@ -106,7 +106,7 @@ sub submit_fact {
         $req_uri,
         Content_Type => 'application/json',
         Accept       => 'application/json',
-        Content      => JSON->new->ascii->encode( $fact->as_struct ),
+        Content      => JSON()->new({ ascii => 1 })->encode( $fact->as_struct ),
     );
     $req->authorization_basic( $self->profile->resource->guid, $self->secret->content );
 
@@ -179,7 +179,7 @@ sub register {
         $req_uri,
         Content_Type => 'application/json',
         Accept       => 'application/json',
-        Content      => JSON->new->ascii->encode(
+        Content      => JSON()->new({ ascii => 1 })->encode(
             [ $self->profile->as_struct, $self->secret->as_struct ]
         ),
     );
@@ -233,7 +233,7 @@ sub _error {
     my ( $self, $res, $prefix ) = @_;
     $prefix ||= "unrecognized error";
     if ( ref($res) && $res->header('Content-Type') eq 'application/json' ) {
-        my $entity = JSON->new->ascii->decode( $res->content );
+        my $entity = JSON()->new({ ascii => 1 })->decode( $res->content );
         return "$prefix\: $entity->{error}";
     }
     else {
