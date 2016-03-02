@@ -2,7 +2,12 @@ Revision history for Metabase-Client-Simple
 
 {{$NEXT}}
 
-  - switch from JSON.pm to JSON::MaybeXS
+  [Changes]
+
+  - Switched from JSON.pm to JSON::MaybeXS for better insulation
+    from upstream volatility.
+
+  - Switched from LWP to HTTP::Tiny as web user-agent.
 
 0.010     2015-01-27 12:06:58-05:00 America/New_York
 
