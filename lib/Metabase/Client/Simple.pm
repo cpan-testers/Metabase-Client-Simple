@@ -35,7 +35,8 @@ Valid arguments are:
   uri     - the root URI for the metabase server
 
 If you use a C<uri> argument with the 'https' scheme, you must have
-L<IO::Socket::SSL> and L<Net::SSLeay> installed.
+L<IO::Socket::SSL> and L<Net::SSLeay> installed.  You may also
+require L<Mozilla::CA>.
 
 =cut
 
