@@ -7,7 +7,6 @@ use Metabase::User::Profile ();
 use Metabase::User::Secret  ();
 
 use Test::More 0.88;
-END { done_testing }
 
 require_ok('Metabase::Client::Simple');
 
@@ -50,8 +49,6 @@ is( $client->uri, 'http://metabase.example.com/', "Trailing slash added" );
 
 $args->{uri} = 'fake://metabase.example.com/';
 eval { Metabase::Client::Simple->new($args) };
-like(
-    $@,
-    qr/Scheme 'fake' is not supported/,
-    "Bad scheme causes new() to die"
-);
+like( $@, qr/Scheme 'fake' is not supported/, "Bad scheme causes new() to die" );
+
+done_testing;
