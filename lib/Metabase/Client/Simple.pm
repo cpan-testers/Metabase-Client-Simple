@@ -7,7 +7,6 @@ package Metabase::Client::Simple;
 
 our $VERSION = '0.011';
 
-use HTTP::Status 5.817 qw/:constants/;
 use JSON::MaybeXS;
 use HTTP::Tiny 0.056; # can_ssl
 use URI;
@@ -117,7 +116,7 @@ sub submit_fact {
 
     my $res = $self->_ua->post(@req);
 
-    if ( $res->{status} == HTTP_UNAUTHORIZED ) {
+    if ( $res->{status} == 401 ) {
         if ( $self->guid_exists( $self->profile->guid ) ) {
             Carp::confess $self->_error( $res => "authentication failed" );
         }
