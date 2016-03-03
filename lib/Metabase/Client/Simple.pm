@@ -180,12 +180,14 @@ sub register {
 
     my @req = (
         $req_uri,
-        headers => {
-            Content_Type => 'application/json',
-            Accept       => 'application/json',
-        },
-        content => JSON::MaybeXS->new( { ascii => 1 } )
-          ->encode( [ $self->profile->as_struct, $self->secret->as_struct ] ),
+        {
+            headers => {
+                Content_Type => 'application/json',
+                Accept       => 'application/json',
+            },
+            content => JSON::MaybeXS->new( { ascii => 1 } )
+              ->encode( [ $self->profile->as_struct, $self->secret->as_struct ] ),
+        }
     );
 
     my $res = $self->_ua->post(@req);
