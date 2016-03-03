@@ -5,7 +5,7 @@ use warnings;
 package Metabase::Client::Simple;
 # ABSTRACT: a client that submits to Metabase servers
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use JSON::MaybeXS;
 use HTTP::Tiny 0.056; # can_ssl
