@@ -242,6 +242,9 @@ sub _error {
         my $entity = JSON::MaybeXS->new( { ascii => 1 } )->decode( $res->{content} );
         return "$prefix\: $entity->{error}";
     }
+    elsif ( ref($res) && $res->{status} == 599 && $res->{headers}{'content-type'} eq 'text/plain' ) {
+        return "$prefix\: $res->{content}";
+    }
     else {
         return "$prefix\: " . $res->{reason};
     }
